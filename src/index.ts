@@ -2,13 +2,18 @@
 const allowedProductionOrigins = ['https://mc-inspect.pages.dev'];
 const allowedLocalOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
-// Set CORS headers
-function corsHeaders(origin) {
-  return {
-    'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
-  };
+// Create response
+function createResponse(body: object, origin: string, status: number, headers: string[] = []) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+  });
 }
 
 export default {
@@ -20,36 +25,13 @@ export default {
     const isLocalOrigin = allowedLocalOrigins.includes(origin);
 
     // Handle preflight request
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        headers: {
-          ...corsHeaders(origin),
-          'Access-Control-Max-Age': '86400',
-        },
-      });
-    }
+    if (request.method === 'OPTIONS') return createResponse({}, origin, 200, ['"Access-Control-Max-Age": "86400"']);
 
     // Handle forbidden request (not production origin and not local origin with correct key)
-    if (!isProductionOrigin && !(isLocalOrigin && apiKey === env.API_KEY)) {
-      return new Response('Forbidden', {
-        status: 403,
-        headers: {
-          ...corsHeaders(origin),
-          'Content-Type': 'text/plain',
-        },
-      });
-    }
+    if (!isProductionOrigin && !(isLocalOrigin && apiKey === env.API_KEY)) return createResponse({ error: 'Forbidden' }, origin, 403);
 
     // Handle wrong request method
-    if (request.method !== 'GET') {
-      return new Response('Method Not Allowed', {
-        status: 405,
-        headers: {
-          ...corsHeaders(origin),
-          'Content-Type': 'text/plain',
-        },
-      });
-    }
+    if (request.method !== 'GET') return createResponse({ error: 'Method Not Allowed' }, origin, 405);
 
     // Api endpoint-url router
     const url = new URL(request.url);
@@ -73,21 +55,10 @@ export default {
 
       default:
         // Handle invalid request
-        return handleNotFound(origin);
+        return createResponse({ error: 'Not Found' }, origin, 404);
     }
   },
 } satisfies ExportedHandler<Env>;
-
-// Send 404 response
-function handleNotFound(origin) {
-  return new Response('Not Found', {
-    status: 404,
-    headers: {
-      ...corsHeaders(origin),
-      'Content-Type': 'text/plain',
-    },
-  });
-}
 
 // Players api endpoint
 async function handlePlayer(player, origin) {
@@ -129,30 +100,15 @@ async function handlePlayer(player, origin) {
       capeUrl,
     };
 
-    // Send response
-    return new Response(JSON.stringify(responseData), {
-      status: 200,
-      headers: {
-        ...corsHeaders(origin),
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=86400',
-      },
-    });
+    return createResponse(responseData, origin, 200, ["'Cache-Control': 'public, max-age=86400'"]);
   } catch (error) {
     // Log error and send 404 response
     console.error(error);
-    return handleNotFound(origin);
+    return createResponse({ error: 'Not Found' }, origin, 404);
   }
 }
 
 // Servers api endpoint
 function handleServer(server, origin) {
-  return new Response(`Server: ${server}`, {
-    status: 200,
-    headers: {
-      ...corsHeaders(origin),
-      'Content-Type': 'text/plain',
-      'Cache-Control': 'public, max-age=600',
-    },
-  });
+  return createResponse({ server }, origin, 200, ["'Cache-Control': 'public, max-age=600'"]);
 }
