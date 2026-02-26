@@ -1,6 +1,6 @@
 // Allowed origins whitelist
-const allowedProductionOrigins = ['https://mc-inspect.pages.dev'];
-const allowedLocalOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+const allowedProductionOrigins: string[] = ['https://mc-inspect.pages.dev'];
+const allowedLocalOrigins: string[] = ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 // Create response
 function createResponse(body: object, origin: string, status: number, headers: string[] = []) {
@@ -19,7 +19,7 @@ function createResponse(body: object, origin: string, status: number, headers: s
 export default {
   async fetch(request, env): Promise<Response> {
     const origin = request.headers.get('Origin') || '';
-    const apiKey = request.headers.get('X-API-Key');
+    const apiKey = request.headers.get('X-API-Key') || '';
 
     const isProductionOrigin = allowedProductionOrigins.includes(origin);
     const isLocalOrigin = allowedLocalOrigins.includes(origin);
@@ -37,7 +37,7 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
     const segments = path.split('/').filter((element) => element !== '');
-    let route = segments[0];
+    let route: string | null = segments[0];
     const param = segments[1];
 
     if (segments.length !== 2) {
@@ -61,24 +61,21 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 // Players api endpoint
-async function handlePlayer(player, origin) {
+async function handlePlayer(player: string, origin: string) {
   try {
     // Fetch player uuid
     const uuidResponse = await fetch(`https://api.minetools.eu/uuid/${player}`);
-    if (!uuidResponse.ok) {
-      throw new Error(`[handlePlayer|${uuidResponse.status}] Error while fetching uuid`);
-    }
+    if (!uuidResponse.ok) throw new Error(`[handlePlayer|${uuidResponse.status}] Error while fetching uuid`);
+
     const uuidData = await uuidResponse.json();
-    if (!uuidData.id) {
-      throw new Error(`[handlePlayer|404] Player not found`);
-    }
+    if (!uuidData.id) throw new Error(`[handlePlayer|404] Player not found`);
+
     const uuid = uuidData.id.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5');
 
     // Fetch player profile
     const profileResponse = await fetch(`https://api.minetools.eu/profile/${uuid}`);
-    if (!profileResponse.ok) {
-      throw new Error(`[handlePlayer|${profileResponse.status}] Error while fetching profile`);
-    }
+    if (!profileResponse.ok) throw new Error(`[handlePlayer|${profileResponse.status}] Error while fetching profile`);
+
     const profileData = await profileResponse.json();
 
     // Parse profile data
@@ -109,6 +106,6 @@ async function handlePlayer(player, origin) {
 }
 
 // Servers api endpoint
-function handleServer(server, origin) {
+function handleServer(server: string, origin: string) {
   return createResponse({ server }, origin, 200, ["'Cache-Control': 'public, max-age=600'"]);
 }
