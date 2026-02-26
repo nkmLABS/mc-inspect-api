@@ -2,6 +2,12 @@
 const allowedProductionOrigins: string[] = ['https://mc-inspect.pages.dev'];
 const allowedLocalOrigins: string[] = ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
+// Type for the player UUID data from the minetools API
+type UuidData = {
+  id: string;
+  name: string;
+};
+
 // Create response
 function createResponse(body: object, origin: string, status: number, headers: { [key: string]: string } = {}) {
   return new Response(JSON.stringify(body), {
@@ -67,7 +73,7 @@ async function handlePlayer(player: string, origin: string) {
     const uuidResponse = await fetch(`https://api.minetools.eu/uuid/${player}`);
     if (!uuidResponse.ok) throw new Error(`[handlePlayer|${uuidResponse.status}] Error while fetching uuid`);
 
-    const uuidData = await uuidResponse.json();
+    const uuidData: UuidData = await uuidResponse.json();
     if (!uuidData.id) throw new Error(`[handlePlayer|404] Player not found`);
 
     const uuid = uuidData.id.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5');
