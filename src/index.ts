@@ -8,6 +8,33 @@ type UuidData = {
   name: string;
 };
 
+// Type for the player profile data from the minetools API
+type ProfileData = {
+  raw: {
+    properties: [
+      {
+        value: string;
+      },
+    ];
+  };
+};
+
+// Type for the decoded base64 player profile data
+type TextureDataDecoded = {
+  profileName: string;
+  textures: {
+    SKIN: {
+      url: string;
+      metadata?: {
+        model?: string;
+      };
+    };
+    CAPE?: {
+      url: string;
+    };
+  };
+};
+
 // Create response
 function createResponse(body: object, origin: string, status: number, headers: { [key: string]: string } = {}) {
   return new Response(JSON.stringify(body), {
@@ -82,11 +109,11 @@ async function handlePlayer(player: string, origin: string) {
     const profileResponse = await fetch(`https://api.minetools.eu/profile/${uuid}`);
     if (!profileResponse.ok) throw new Error(`[handlePlayer|${profileResponse.status}] Error while fetching profile`);
 
-    const profileData = await profileResponse.json();
+    const profileData: ProfileData = await profileResponse.json();
 
     // Parse profile data
     const textureDataEncoded = profileData.raw.properties[0].value;
-    const textureDataDecoded = JSON.parse(atob(textureDataEncoded));
+    const textureDataDecoded: TextureDataDecoded = JSON.parse(atob(textureDataEncoded));
     const playerModel = textureDataDecoded.textures.SKIN.metadata?.model === 'slim' ? 'slim' : 'wide';
     const capeUrl = textureDataDecoded.textures.CAPE?.url;
     const skinUrl = textureDataDecoded.textures.SKIN.url;
