@@ -46,7 +46,7 @@ export default {
 
       default:
         // Handle invalid request
-        return createResponse({ error: 'Not Found' }, origin, 404);
+        return createResponse({ error: 'Route Not Found' }, origin, 404);
     }
   },
 } satisfies ExportedHandler<Env>;

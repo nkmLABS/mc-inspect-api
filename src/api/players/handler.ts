@@ -42,6 +42,6 @@ export async function handlePlayer(player: string, origin: string) {
   } catch (error) {
     // Log error and send 404 response
     console.error(error);
-    return createResponse({ error: 'Not Found' }, origin, 404);
+    return createResponse({ error: 'Player Not Found' }, origin, 404);
   }
 }
