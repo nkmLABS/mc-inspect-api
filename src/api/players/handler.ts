@@ -2,7 +2,7 @@ import type { UuidData, ProfileData, TextureDataDecoded } from './types';
 import { createResponse } from '../../shared/response';
 
 // Players api endpoint
-export async function handlePlayer(player: string, origin: string) {
+export async function handlePlayer(player: string, origin: string): Promise<Response> {
   try {
     // Fetch player uuid
     const uuidResponse = await fetch(`https://api.minetools.eu/uuid/${player}`);
