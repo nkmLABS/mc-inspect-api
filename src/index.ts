@@ -8,26 +8,26 @@ const allowedLocalOrigins: string[] = ['http://localhost:3000', 'http://127.0.0.
 
 // Main handler and router
 export default {
-  async fetch(request, env): Promise<Response> {
-    const origin = request.headers.get('Origin') || '';
-    const apiKey = request.headers.get('X-API-Key') || '';
+  async fetch(req, env): Promise<Response> {
+    const origin = req.headers.get('Origin') || '';
+    const apiKey = req.headers.get('X-API-Key') || '';
 
     const isProductionOrigin = allowedProductionOrigins.includes(origin);
     const isLocalOrigin = allowedLocalOrigins.includes(origin);
 
     // Handle preflight request
-    if (request.method === 'OPTIONS') return createResponse({}, origin, 200, { 'Access-Control-Max-Age': '86400' });
+    if (req.method === 'OPTIONS') return createResponse({}, origin, 200, { 'Access-Control-Max-Age': '86400' });
 
     // Handle forbidden request (not production origin and not local origin with correct key)
     if (!isProductionOrigin && !(isLocalOrigin && apiKey === env.API_KEY)) return createResponse({ error: 'Forbidden' }, origin, 403);
 
     // Handle wrong request method
-    if (request.method !== 'GET') return createResponse({ error: 'Method Not Allowed' }, origin, 405);
+    if (req.method !== 'GET') return createResponse({ error: 'Method Not Allowed' }, origin, 405);
 
     // Api endpoint-url router
-    const url = new URL(request.url);
+    const url = new URL(req.url);
     const path = url.pathname;
-    const segments = path.split('/').filter((element) => element !== '');
+    const segments = path.split('/').filter((e) => e !== '');
     let route: string | null = segments[0];
     const param = segments[1];
 

@@ -31,6 +31,7 @@ export type TextureDataDecoded = {
   };
 };
 
+// Type for returned data
 export type ResponseData = {
   name: string;
   uuid: string;

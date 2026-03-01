@@ -39,9 +39,9 @@ export async function handlePlayer(player: string, origin: string): Promise<Resp
     };
 
     return createResponse(responseData, origin, 200, { 'Cache-Control': 'public, max-age=86400' });
-  } catch (error) {
+  } catch (err) {
     // Log error and send 404 response
-    console.error(error);
+    console.error(err);
     return createResponse({ error: 'Player Not Found' }, origin, 404);
   }
 }
