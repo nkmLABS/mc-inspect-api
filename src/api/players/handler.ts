@@ -1,4 +1,4 @@
-import type { UuidData, ProfileData, TextureDataDecoded } from './types';
+import type { UuidData, ProfileData, TextureDataDecoded, ResponseData } from './types';
 import { createResponse } from '../../shared/response';
 
 // Players api endpoint
@@ -25,11 +25,11 @@ export async function handlePlayer(player: string, origin: string): Promise<Resp
     const playerModel = textureDataDecoded.textures.SKIN.metadata?.model === 'slim' ? 'slim' : 'wide';
     const capeUrl = textureDataDecoded.textures.CAPE?.url;
     const skinUrl = textureDataDecoded.textures.SKIN.url;
-    const skinId = skinUrl.split('/').at(-1);
+    const skinId = skinUrl.split('/').at(-1)!;
     const name = textureDataDecoded.profileName;
 
     // Create response object
-    const responseData = {
+    const responseData: ResponseData = {
       name,
       uuid,
       skinId,

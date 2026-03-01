@@ -30,3 +30,12 @@ export type TextureDataDecoded = {
     };
   };
 };
+
+export type ResponseData = {
+  name: string;
+  uuid: string;
+  skinId: string;
+  playerModel: string;
+  skinUrl: string;
+  capeUrl?: string;
+};
