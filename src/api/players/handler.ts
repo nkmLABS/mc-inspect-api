@@ -1,8 +1,8 @@
-import { UuidData, ProfileData, TextureDataDecoded } from './types.js';
-import { createResponse } from '../../shared/response.js';
+import type { UuidData, ProfileData, TextureDataDecoded, ResponseData } from './types';
+import { createResponse } from '../../shared/response';
 
 // Players api endpoint
-export async function handlePlayer(player: string, origin: string) {
+export async function handlePlayer(player: string, origin: string): Promise<Response> {
   try {
     // Fetch player uuid
     const uuidResponse = await fetch(`https://api.minetools.eu/uuid/${player}`);
@@ -25,11 +25,11 @@ export async function handlePlayer(player: string, origin: string) {
     const playerModel = textureDataDecoded.textures.SKIN.metadata?.model === 'slim' ? 'slim' : 'wide';
     const capeUrl = textureDataDecoded.textures.CAPE?.url;
     const skinUrl = textureDataDecoded.textures.SKIN.url;
-    const skinId = skinUrl.split('/').at(-1);
+    const skinId = skinUrl.split('/').at(-1)!;
     const name = textureDataDecoded.profileName;
 
     // Create response object
-    const responseData = {
+    const responseData: ResponseData = {
       name,
       uuid,
       skinId,
@@ -39,9 +39,9 @@ export async function handlePlayer(player: string, origin: string) {
     };
 
     return createResponse(responseData, origin, 200, { 'Cache-Control': 'public, max-age=86400' });
-  } catch (error) {
+  } catch (err) {
     // Log error and send 404 response
-    console.error(error);
-    return createResponse({ error: 'Not Found' }, origin, 404);
+    console.error(err);
+    return createResponse({ error: 'Player Not Found' }, origin, 404);
   }
 }

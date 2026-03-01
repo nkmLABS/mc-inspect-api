@@ -1,5 +1,5 @@
 // Create response
-export function createResponse(body: object, origin: string, status: number, headers: { [key: string]: string } = {}) {
+export function createResponse(body: object, origin: string, status: number, headers: { [key: string]: string } = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
