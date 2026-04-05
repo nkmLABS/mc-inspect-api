@@ -2,7 +2,7 @@ import type { PreLookupData, ProfileData, TextureDataDecoded, ResponseData } fro
 import { createResponse } from '../../shared/response';
 
 // Players api endpoint
-export async function handlePlayer(req: Request, player: string, origin: string): Promise<Response> {
+export async function handlePlayer(req: Request, ctx: ExecutionContext, player: string, origin: string): Promise<Response> {
   try {
     // Check whether response is present in cache
     const playersCache = await caches.open('playersCache');
@@ -48,8 +48,8 @@ export async function handlePlayer(req: Request, player: string, origin: string)
     };
 
     // Cache and return response
-    res = createResponse(responseData, origin, 200, { 'Cache-Control': 'public, max-age=3600, s-maxage=86400' });
-    await playersCache.put(req, res);
+    res = createResponse(responseData, origin, 200, { 'Cache-Control': 'public, max-age=43200, s-maxage=86400' });
+    ctx.waitUntil(playersCache.put(req, res.clone()));
     return res;
   } catch (err) {
     // Handle error
