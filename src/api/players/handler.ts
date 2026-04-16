@@ -1,11 +1,11 @@
 import type {
+  UpstreamPlayerData,
   UpstreamMojangPreData,
-  UpstreamPlayerdbProfileData,
+  UpstreamMojangData,
+  UpstreamPlayerdbData,
+  UpstreamAshconData,
   TextureDataDecoded,
   DownstreamData,
-  UpstreamPlayerData,
-  UpstreamMojangProfileData,
-  UpstreamAshconProfileData,
 } from './types';
 import { createResponse } from '../../shared/response';
 
@@ -91,16 +91,16 @@ async function fetchMojang(player: string, userAgent: string): Promise<UpstreamP
   }
 
   // Fetch player profile
-  const profileRes = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${player}`, {
+  const res = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${player}`, {
     headers: { 'User-Agent': userAgent },
   });
-  if (profileRes.status === 204 || profileRes.status === 400) return null;
-  if (!profileRes.ok) throw new Error(`[fetchMojang|${profileRes.status}] Error while fetching Mojang API`);
+  if (res.status === 204 || res.status === 400) return null;
+  if (!res.ok) throw new Error(`[fetchMojang|${res.status}] Error while fetching Mojang API`);
 
-  const profileDat: UpstreamMojangProfileData = await profileRes.json();
+  const dat: UpstreamMojangData = await res.json();
 
   // Map and return textureDataEncoded
-  return profileDat.properties[0].value;
+  return dat.properties[0].value;
 }
 
 async function fetchPlayerdb(player: string, userAgent: string): Promise<UpstreamPlayerData> {
@@ -111,7 +111,7 @@ async function fetchPlayerdb(player: string, userAgent: string): Promise<Upstrea
   if (res.status === 404 || res.status === 400) return null;
   if (!res.ok) throw new Error(`[fetchPlayerdb|${res.status}] Error while fetching PlayerDB API`);
 
-  const dat: UpstreamPlayerdbProfileData = await res.json();
+  const dat: UpstreamPlayerdbData = await res.json();
 
   // Map and return textureDataEncoded
   return dat.data.player.properties[0].value;
@@ -125,7 +125,7 @@ async function fetchAshcon(player: string, userAgent: string): Promise<UpstreamP
   if (res.status === 404 || res.status === 400) return null;
   if (!res.ok) throw new Error(`[fetchAshcon|${res.status}] Error while fetching Ashcon API`);
 
-  const dat: UpstreamAshconProfileData = await res.json();
+  const dat: UpstreamAshconData = await res.json();
 
   // Map and return textureDataEncoded
   return dat.textures.raw.value;

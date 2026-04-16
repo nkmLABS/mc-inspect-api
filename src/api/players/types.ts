@@ -8,7 +8,7 @@ export type UpstreamMojangPreData = {
 };
 
 // Upstream data from mojang API profile lookup
-export type UpstreamMojangProfileData = {
+export type UpstreamMojangData = {
   properties: [
     {
       value: string;
@@ -17,7 +17,7 @@ export type UpstreamMojangProfileData = {
 };
 
 // Upstream data from PlayerDB API profile lookup
-export type UpstreamPlayerdbProfileData = {
+export type UpstreamPlayerdbData = {
   data: {
     player: {
       properties: [
@@ -30,7 +30,7 @@ export type UpstreamPlayerdbProfileData = {
 };
 
 // Upstream data from Ashcon API profile lookup
-export type UpstreamAshconProfileData = {
+export type UpstreamAshconData = {
   textures: {
     raw: {
       value: string;
