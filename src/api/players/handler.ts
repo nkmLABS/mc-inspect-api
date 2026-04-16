@@ -9,6 +9,9 @@ export async function handlePlayer(req: Request, ctx: ExecutionContext, player: 
     let res = await playersCache.match(req);
     if (res) return res;
 
+    // Validate player
+    if (!isValidName(player) && !isValidUuid(player)) return createResponse({ error: 'Player Not Found' }, origin, 404);
+
     // Try upstream APIs
     const upstreamAPIs = [fetchMojang] as const;
     let upstreamData: UpstreamPlayerData = null;
@@ -56,10 +59,19 @@ export async function handlePlayer(req: Request, ctx: ExecutionContext, player: 
   }
 }
 
+function isValidName(player: string): boolean {
+  const nameCriteria = /^[a-zA-Z0-9_]{3,16}$/;
+  return nameCriteria.test(player);
+}
+
+function isValidUuid(player: string): boolean {
+  const uuidCriteria = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-fA-F]{32})$/;
+  return uuidCriteria.test(player);
+}
+
 async function fetchMojang(player: string, userAgent: string): Promise<UpstreamPlayerData> {
   // Fetch player uuid
-  const uuidCriteria = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-fA-F]{32})$/;
-  if (!uuidCriteria.test(player)) {
+  if (!isValidUuid(player)) {
     const preRes = await fetch(`https://api.minecraftservices.com/minecraft/profile/lookup/name/${player}`, {
       headers: { 'User-Agent': userAgent },
     });
