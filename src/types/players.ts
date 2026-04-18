@@ -38,6 +38,9 @@ export type UpstreamAshconData = {
   };
 };
 
+// Function to fetch upstream data from player APIs
+export type UpstreamAPI = (player: string, userAgent: string) => Promise<UpstreamPlayerData>;
+
 // Decoded base64 player profile data
 export type TextureDataDecoded = {
   profileName: string;
