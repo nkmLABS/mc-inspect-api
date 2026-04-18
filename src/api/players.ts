@@ -4,10 +4,11 @@ import type {
   UpstreamMojangData,
   UpstreamPlayerdbData,
   UpstreamAshconData,
+  UpstreamAPI,
   TextureDataDecoded,
   DownstreamData,
-} from './types';
-import { createResponse } from '../../shared/response';
+} from '../types';
+import { createResponse } from '../utils/response';
 
 // Players api endpoint
 export async function handlePlayer(req: Request, ctx: ExecutionContext, player: string, origin: string, userAgent: string): Promise<Response> {
@@ -21,7 +22,7 @@ export async function handlePlayer(req: Request, ctx: ExecutionContext, player: 
     if (!isValidName(player) && !isValidUuid(player)) return createResponse({ error: 'Player Not Found' }, origin, 404);
 
     // Try upstream APIs
-    const upstreamAPIs = [fetchMojang, fetchPlayerdb, fetchAshcon] as const;
+    const upstreamAPIs = [fetchMojang, fetchPlayerdb, fetchAshcon] as const satisfies UpstreamAPI[];
     let upstreamData: UpstreamPlayerData = null;
 
     for (const upstreamAPI of upstreamAPIs) {
