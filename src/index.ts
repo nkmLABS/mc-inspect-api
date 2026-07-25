@@ -6,7 +6,7 @@ import { handleServer } from './api/servers';
 export default {
   async fetch(req, env, ctx): Promise<Response> {
     const origin = req.headers.get('Origin') || '';
-    const userAgent = env.USER_AGENT || 'mc-inspect-api/0.0.0';
+    const userAgent = env.USER_AGENT || 'mc-inspect-api/1.0.0';
 
     // Handle preflight request
     if (req.method === 'OPTIONS') return createResponse({}, origin, 200, { 'Access-Control-Max-Age': '86400' });
